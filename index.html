@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>mtest</title>
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <script src="js/mustache.4.2.0.js"></script>
+</head>
+<body>
+
+<h1>M_tst</h1>
+
+<a href="./">дефолтная страница</a>
+<a href="./?pg=page1">страница1</a>
+
+<div id="content"></div>
+
+</body>
+
+<script>
+
+    function getParamPg() {
+        var url_string = window.location.href;
+        var url = new URL(url_string);
+        var paramValue = url.searchParams.get("pg");
+        return !paramValue ? 'def' : paramValue;
+    }
+
+    function renderPg() {
+        var pgName = getParamPg();
+        $.get( 'pgs/' + pgName + '/tml.html', function( tml ) {
+            console.log('tml: ' + tml);
+            $.get( 'pgs/' + pgName + '/data.json', function(data) {
+                var rendered = Mustache.render(tml, data);
+                $("#content").html(rendered);
+            })
+                .fail(function() {
+                    $("#content").html(tml);
+                });
+        })
+            .fail(function() {
+                $("#content").html('<p style="color: red;">Не найден темплейт: ' + 'pgs/' + pgName + '/tml.html</p>');
+            });
+    }
+
+
+    $(function () {
+        renderPg()
+    });
+</script>
+</html>
